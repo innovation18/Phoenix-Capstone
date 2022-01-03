@@ -119,11 +119,11 @@
 
 # Build Docker Image
 
-    docker build --tag=app .
+    docker build --tag=phoenix .
 
 # Run Container locally in bash
 
-    docker run -it app bash
+    docker run -it phoenix bash
 
     nohup flask run &
 
@@ -135,7 +135,7 @@
 
 # Run Container Locally
 
-    bash-3.2$ nohup docker run -p 8000:80 app &
+    bash-3.2$ nohup docker run -p 8000:80 phoenix &
 
     bash-3.2$ curl http://localhost:8000/
     Hello World, This is sample application deployed by Hanish Arora for Udacity DevOps Capstone! Happy Coding!
@@ -143,9 +143,20 @@
 # Check if Container is running
 
     bash-3.2$ docker ps
-    CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                  NAMES
-    f42aaf461af6   app       "gunicorn -b 0.0.0.0…"   43 seconds ago   Up 42 seconds   0.0.0.0:8000->80/tcp   upbeat_burnell
+    CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS        PORTS                  NAMES
+    76532a489884   phoenix   "gunicorn -b 0.0.0.0…"   2 seconds ago   Up 1 second   0.0.0.0:8000->80/tcp   lucid_chaplygin
 
 # Stop Container
 
-    docker stop f42aaf461af6
+    docker stop 76532a489884
+
+# Push Repository to Docker Hub
+
+    --> Authenticate & tag
+
+    docker login --username=hanisharora
+    docker tag phoenix hanisharora/phoenix
+
+    --> Push image to a docker repository
+
+    docker push hanisharora/phoenix
