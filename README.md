@@ -81,7 +81,7 @@
 
     all: install lint test
 
-# make install - Install Dependencies
+# Install Dependencies
 
     output to install should look like below:
 
@@ -106,7 +106,7 @@
     Installing collected packages: gunicorn, flask
     Successfully installed flask-2.0.2 gunicorn-20.1.0
 
-# make lint - Lint Dockerfile
+# Lint Dockerfile
 
     output to lint should look like below:
 
@@ -149,18 +149,3 @@
 # Stop Container
 
     docker stop f42aaf461af6
-
-# Create Makefile
-
-    #Makefile is created to install dependecies and lint Dockerfile
-
-    install:
-    # This should be run from inside a virtualenv
-    	pip install --upgrade pip &&\
-        	pip install -r requirements.txt
-
-    lint:
-        hadolint Dockerfile
-        pylint --disable=R,C,W1203,W1202 app.py
-
-    all: install lint test
