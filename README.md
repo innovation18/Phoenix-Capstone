@@ -4,15 +4,13 @@
 
     python3 -m venv ~/.capstone
 
-# Activte Virtual Environment and Install dependencies
+# Activate Virtual Environment and Install dependencies
 
     source ~/.capstone/bin/activate
 
     pip install flask gunicorn
 
 # Create Flask Application
-
-    ---
 
     from flask import Flask
 
@@ -24,8 +22,6 @@
             return f"Hello World, This is sample application deployed by {name} for Udacity DevOps Capstone! Happy Coding!"
 
         return app
-
-    ---
 
 # Run Application
 
