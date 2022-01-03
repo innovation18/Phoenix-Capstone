@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir 'pip<12' &&\
 EXPOSE 80
 
 # Run gunicorn at container launch
-CMD ["gunicorn", "-b", "0.0.0.0:80", "wsgi:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:80", "app:create_app(name='Hanish Arora')"]
