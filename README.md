@@ -160,3 +160,113 @@
     --> Push image to a docker repository
 
     docker push hanisharora/phoenix
+
+# Create Kubernetes Cluster Locally
+
+    bash-3.2$ eksctl create cluster --name=phoenix --region=us-west-2 --without-nodegroup --profile phoenix
+    2022-01-04 21:56:41 [ℹ]  eksctl version 0.77.0
+    2022-01-04 21:56:41 [ℹ]  using region us-west-2
+    2022-01-04 21:56:42 [ℹ]  setting availability zones to [us-west-2c us-west-2a us-west-2d]
+    2022-01-04 21:56:42 [ℹ]  subnets for us-west-2c - public:192.168.0.0/19 private:192.168.96.0/19
+    2022-01-04 21:56:42 [ℹ]  subnets for us-west-2a - public:192.168.32.0/19 private:192.168.128.0/19
+    2022-01-04 21:56:42 [ℹ]  subnets for us-west-2d - public:192.168.64.0/19 private:192.168.160.0/19
+    2022-01-04 21:56:42 [ℹ]  using Kubernetes version 1.21
+    2022-01-04 21:56:42 [ℹ]  creating EKS cluster "phoenix" in "us-west-2" region with
+    2022-01-04 21:56:42 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-west-2 --cluster=phoenix'
+    2022-01-04 21:56:42 [ℹ]  CloudWatch logging will not be enabled for cluster "phoenix" in "us-west-2"
+    2022-01-04 21:56:42 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-west-2 --cluster=phoenix'
+    2022-01-04 21:56:42 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "phoenix" in "us-west-2"
+    2022-01-04 21:56:42 [ℹ]
+    2 sequential tasks: { create cluster control plane "phoenix", wait for control plane to become ready
+    }
+    2022-01-04 21:56:42 [ℹ]  building cluster stack "eksctl-phoenix-cluster"
+    2022-01-04 21:56:45 [ℹ]  deploying stack "eksctl-phoenix-cluster"
+    2022-01-04 21:57:15 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 21:57:46 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 21:58:48 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 21:59:50 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:00:51 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:01:53 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:02:54 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:03:56 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:04:58 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:05:59 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:07:01 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:08:02 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:09:04 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:10:06 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:11:07 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-04 22:13:15 [ℹ]  waiting for the control plane availability...
+    2022-01-04 22:13:15 [✔]  saved kubeconfig as "/Users/hunny/.kube/config"
+    2022-01-04 22:13:15 [ℹ]  no tasks
+    2022-01-04 22:13:15 [✔]  all EKS cluster resources for "phoenix" have been created
+    2022-01-04 22:13:18 [ℹ]  kubectl command should work with "/Users/hunny/.kube/config", try 'kubectl get nodes'
+    2022-01-04 22:13:18 [✔]  EKS cluster "phoenix" in "us-west-2" region is ready
+
+# Create NodeGroups
+
+    bash-3.2$ eksctl create nodegroup --cluster=phoenix --region=us-west-2 --name=phoenix-ng --node-type=t3.micro --nodes=1 --nodes-min=1 --nodes-max=1 --profile phoenix
+    2022-01-04 22:24:50 [ℹ]  eksctl version 0.77.0
+    2022-01-04 22:24:50 [ℹ]  using region us-west-2
+    2022-01-04 22:24:50 [ℹ]  will use version 1.21 for new nodegroup(s) based on control plane version
+    2022-01-04 22:24:57 [ℹ]  nodegroup "phoenix-ng" will use "" [AmazonLinux2/1.21]
+    2022-01-04 22:24:59 [ℹ]  1 nodegroup (phoenix-ng) was included (based on the include/exclude rules)
+    2022-01-04 22:24:59 [ℹ]  will create a CloudFormation stack for each of 1 managed nodegroups in cluster "phoenix"
+    2022-01-04 22:25:00 [ℹ]
+    2 sequential tasks: { fix cluster compatibility, 1 task: { 1 task: { create managed nodegroup "phoenix-ng" } }
+    }
+    2022-01-04 22:25:00 [ℹ]  checking cluster stack for missing resources
+    2022-01-04 22:25:01 [ℹ]  cluster stack has all required resources
+    2022-01-04 22:25:01 [ℹ]  building managed nodegroup stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:25:02 [ℹ]  deploying stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:25:02 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:25:19 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:25:37 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:25:59 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:26:16 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:26:38 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:26:59 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:27:19 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:27:37 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:27:55 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:28:14 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:28:31 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-ng"
+    2022-01-04 22:28:32 [ℹ]  no tasks
+    2022-01-04 22:28:32 [✔]  created 0 nodegroup(s) in cluster "phoenix"
+    2022-01-04 22:28:34 [ℹ]  nodegroup "phoenix-ng" has 1 node(s)
+    2022-01-04 22:28:34 [ℹ]  node "******************" is ready
+    2022-01-04 22:28:34 [ℹ]  waiting for at least 1 node(s) to become ready in "phoenix-ng"
+    2022-01-04 22:28:34 [ℹ]  nodegroup "phoenix-ng" has 1 node(s)
+    2022-01-04 22:28:34 [ℹ]  node "******************" is ready
+    2022-01-04 22:28:34 [✔]  created 1 managed nodegroup(s) in cluster "phoenix"
+    2022-01-04 22:28:36 [ℹ]  checking security group configuration for all nodegroups
+    2022-01-04 22:28:36 [ℹ]  all nodegroups have up-to-date cloudformation templates
+
+# Check Nodes
+
+    bash-3.2$ kubectl get nodes
+    NAME                                         STATUS   ROLES    AGE   VERSION
+    *******.us-west-2.compute.internal           Ready    <none>   76s   *******
+
+# Get Cluster ARN Information
+
+    bash-3.2$ Cluster_ARN=`aws cloudformation list-exports --query "Exports[?Name=='eksctl-phoenix-cluster::ARN'].Value" --no-paginate --output text --profile phoenix`
+    bash-3.2$ echo $Cluster_ARN
+    arn:aws:eks:us-west-2:**********:cluster/phoenix
+
+# Set the current-context in kubeconfig
+
+    bash-3.2$ kubectl config use-context $Cluster_ARN
+    Switched to context "arn:aws:eks:us-west-2:************:cluster/phoenix".
+
+# Configures kubectl to connect to an Amazon EKS cluster - Required if already exists another cluster
+
+    bash-3.2$ aws eks update-kubeconfig --name phoenix --profile phoenix
+    Added new context arn:aws:eks:us-west-2:***********:cluster/phoenix to /Users/hunny/.kube/config
+
+# Check Current Set Context
+
+    bash-3.2$ kubectl config current-context
+    arn:aws:eks:us-west-2:************:cluster/phoenix
+
+# Deploy Application
