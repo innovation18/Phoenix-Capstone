@@ -242,31 +242,116 @@
     2022-01-04 22:28:36 [ℹ]  checking security group configuration for all nodegroups
     2022-01-04 22:28:36 [ℹ]  all nodegroups have up-to-date cloudformation templates
 
+# Create Kubernetes Cluster with Node Groups
+
+    eksctl create cluster \
+    --name phoenix \
+    --region us-west-2 \
+    --version 1.19 \
+    --nodegroup-name phoenix-workers \
+    --node-type t2.micro \
+    --nodes 2 \
+    --nodes-min 1 \
+    --nodes-max 2 \
+    --profile phoenix
+
+    bash-3.2$ eksctl create cluster --name phoenix --region us-west-2 --version 1.19 --nodegroup-name phoenix-workers --node-type t2.micro --nodes 2 --nodes-min 1 --nodes-max 2 --profile phoenix
+    2022-01-05 09:32:06 [ℹ]  eksctl version 0.77.0
+    2022-01-05 09:32:06 [ℹ]  using region us-west-2
+    2022-01-05 09:32:08 [ℹ]  setting availability zones to [us-west-2b us-west-2a us-west-2c]
+    2022-01-05 09:32:08 [ℹ]  subnets for us-west-2b - public:192.168.0.0/19 private:192.168.96.0/19
+    2022-01-05 09:32:08 [ℹ]  subnets for us-west-2a - public:192.168.32.0/19 private:192.168.128.0/19
+    2022-01-05 09:32:08 [ℹ]  subnets for us-west-2c - public:192.168.64.0/19 private:192.168.160.0/19
+    2022-01-05 09:32:08 [ℹ]  nodegroup "phoenix-workers" will use "" [AmazonLinux2/1.19]
+    2022-01-05 09:32:08 [ℹ]  using Kubernetes version 1.19
+    2022-01-05 09:32:08 [ℹ]  creating EKS cluster "phoenix" in "us-west-2" region with managed nodes
+    2022-01-05 09:32:08 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
+    2022-01-05 09:32:08 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-west-2 --cluster=phoenix'
+    2022-01-05 09:32:08 [ℹ]  CloudWatch logging will not be enabled for cluster "phoenix" in "us-west-2"
+    2022-01-05 09:32:08 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-west-2 --cluster=phoenix'
+    2022-01-05 09:32:08 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "phoenix" in "us-west-2"
+    2022-01-05 09:32:08 [ℹ]
+    2 sequential tasks: { create cluster control plane "phoenix",
+        2 sequential sub-tasks: {
+            wait for control plane to become ready,
+            create managed nodegroup "phoenix-workers",
+        }
+    }
+    2022-01-05 09:32:08 [ℹ]  building cluster stack "eksctl-phoenix-cluster"
+    2022-01-05 09:32:10 [ℹ]  deploying stack "eksctl-phoenix-cluster"
+    2022-01-05 09:32:40 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-cluster"
+    2022-01-05 09:46:38 [ℹ]  building managed nodegroup stack "eksctl-phoenix-nodegroup-phoenix-workers"
+    2022-01-05 09:46:40 [ℹ]  deploying stack "eksctl-phoenix-nodegroup-phoenix-workers"
+    2022-01-05 09:46:40 [ℹ]  waiting for CloudFormation stack "eksctl-phoenix-nodegroup-phoenix-workers"
+    2022-01-05 09:51:03 [ℹ]  waiting for the control plane availability...
+    2022-01-05 09:51:04 [✔]  saved kubeconfig as "/Users/hunny/.kube/config"
+    2022-01-05 09:51:04 [ℹ]  no tasks
+    2022-01-05 09:51:04 [✔]  all EKS cluster resources for "phoenix" have been created
+    2022-01-05 09:51:05 [ℹ]  nodegroup "phoenix-workers" has 2 node(s)
+    2022-01-05 09:51:05 [ℹ]  node "**********.us-west-2.compute.internal" is ready
+    2022-01-05 09:51:05 [ℹ]  node "**********.us-west-2.compute.internal" is ready
+    2022-01-05 09:51:05 [ℹ]  waiting for at least 1 node(s) to become ready in "phoenix-workers"
+    2022-01-05 09:51:05 [ℹ]  nodegroup "phoenix-workers" has 2 node(s)
+    2022-01-05 09:51:05 [ℹ]  node "**********.us-west-2.compute.internal" is ready
+    2022-01-05 09:51:05 [ℹ]  node "**********.us-west-2.compute.internal" is ready
+    2022-01-05 09:51:08 [ℹ]  kubectl command should work with "/Users/hunny/.kube/config", try 'kubectl get nodes'
+    2022-01-05 09:51:08 [✔]  EKS cluster "phoenix" in "us-west-2" region is ready
+
 # Check Nodes
 
-    bash-3.2$ kubectl get nodes
-    NAME                                         STATUS   ROLES    AGE   VERSION
-    *******.us-west-2.compute.internal           Ready    <none>   76s   *******
+    bash-3.2$ kubectl get nodes -o wide
+    NAME                                           STATUS   ROLES    AGE   VERSION               INTERNAL-IP      EXTERNAL-IP     OS-IMAGE         KERNEL-VERSION                CONTAINER-RUNTIME
+    ****************.compute.internal              Ready    <none>   21m   v1.19.15-eks-9c63c4   ************     ************    Amazon Linux 2   ************                  docker://20.10.7
+    ****************..compute.internal             Ready    <none>   21m   v1.19.15-eks-9c63c4   ************     ************    Amazon Linux 2   ************                  docker://20.10.7
 
 # Get Cluster ARN Information
 
     bash-3.2$ Cluster_ARN=`aws cloudformation list-exports --query "Exports[?Name=='eksctl-phoenix-cluster::ARN'].Value" --no-paginate --output text --profile phoenix`
     bash-3.2$ echo $Cluster_ARN
-    arn:aws:eks:us-west-2:**********:cluster/phoenix
+    arn:aws:eks:us-west-2:*************:cluster/phoenix
 
 # Set the current-context in kubeconfig
 
     bash-3.2$ kubectl config use-context $Cluster_ARN
-    Switched to context "arn:aws:eks:us-west-2:************:cluster/phoenix".
+    Switched to context "arn:aws:eks:us-west-2:**************:cluster/phoenix".
 
 # Configures kubectl to connect to an Amazon EKS cluster - Required if already exists another cluster
 
     bash-3.2$ aws eks update-kubeconfig --name phoenix --profile phoenix
-    Added new context arn:aws:eks:us-west-2:***********:cluster/phoenix to /Users/hunny/.kube/config
+    Updated context arn:aws:eks:us-west-2:**************:cluster/phoenix in /Users/hunny/.kube/config
 
 # Check Current Set Context
 
     bash-3.2$ kubectl config current-context
-    arn:aws:eks:us-west-2:************:cluster/phoenix
+    arn:aws:eks:us-west-2:**************:cluster/phoenix
+
+# Check Pods
+
+    bash-3.2$ kubectl get pods
+    No resources found in default namespace.
 
 # Deploy Application
+
+    bash-3.2$ kubectl apply -f deploy.yml
+    deployment.apps/phoenix created
+
+    bash-3.2$ kubectl rollout status deployment/phoenix
+    deployment "phoenix" successfully rolled out
+
+    bash-3.2$ kubectl apply -f service.yml
+    service/phoenix created
+
+# Test Accessibility
+
+    bash-3.2$ kubectl get svc -o wide
+    NAME         TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)        AGE   SELECTOR
+    kubernetes   ClusterIP      *.*.*.*          <none>                                                                   443/TCP        32m   <none>
+    phoenix      LoadBalancer   *.*.*.*          **********.us-west-2.elb.amazonaws.com                                   80:32237/TCP   14s   app=phoenix
+
+    bash-3.2$ LoadBalancerHostName=`kubectl get svc phoenix -o jsonpath="{.status.loadBalancer.ingress[*].hostname}"`
+
+    bash-3.2$ echo $LoadBalancerHostName
+    **********.us-west-2.elb.amazonaws.com
+
+    bash-3.2$ curl ${LoadBalancerHostName}:80
+    Hello World, This is sample application deployed by Hanish Arora for Udacity DevOps Capstone! Happy Coding!
