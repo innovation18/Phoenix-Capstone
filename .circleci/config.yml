@@ -223,7 +223,7 @@ jobs:
             echo $LoadBalancer
             echo ""
 
-            if curl -s ${LoadBalancerHostName}:80 | grep "Udacity DevOps Capstone!"
+            if curl -s ${LoadBalancer}:80 | grep "Udacity DevOps Capstone!"
             then
               echo "Here It is marking completion of DevOps Capstone!"
               echo "Wait! You got to collect evidences!"
