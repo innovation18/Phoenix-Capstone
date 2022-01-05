@@ -54,9 +54,15 @@ jobs:
 
             . phoenix/bin/activate
 
-            echo "Change Deployment Version"
+            cat app.py | grep VERSION
+            echo "Change Deployment Version..."
             sed -i 's/VERSION/'${CIRCLE_WORKFLOW_ID:0:7}'/g' app.py
 
+            echo ""
+            echo "Look out for the change..."
+            cat app.py | grep VERSION
+
+            echo ""
             echo "Building Image Now..."
             docker build -t phoenix .
 
@@ -80,9 +86,72 @@ jobs:
             echo "PUSH IMAGE TO DOCKER HUB"
             docker push ${DOCKER_USER}/phoenix:${CIRCLE_WORKFLOW_ID:0:7}
 
+  create-eks-cluster:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+
+      - run:
+          name: INSTALL AWSCLI
+          command: |
+
+            pip3 install awscli
+
+            aws --version
+
+      - run:
+          name: INSTALL EKSCTL
+          command: |
+
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
+
+            eksctl version
+
+      - run:
+          name: INSTALL KUBECTL
+          command: |
+
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin
+
+            kubectl version --client
+
+      - run:
+          name: CREATE KUBERNETES CLUSTER
+          command: |
+
+            echo "Check IF Already Exists"
+
+            Cluster_ARN=`aws cloudformation list-exports --query "Exports[?Name=='eksctl-phoenix-cluster::ARN'].Value" --no-paginate --output text`
+
+            if [ -z "$Cluster_ARN" ]
+            then 
+
+            echo "Does Not Exist - Creating One..."
+
+            eksctl create cluster \
+            --name phoenix \
+            --region us-west-2 \
+            --version 1.19 \
+            --nodegroup-name phoenix-workers \
+            --node-type t2.micro \
+            --nodes 2 \
+            --nodes-min 1 \
+            --nodes-max 2 \
+
+
+            else 
+            echo "Already Exists Your Cluster"
+            fi
+
 workflows:
   build-push-deploy:
     jobs:
       - lint
       - build-push-docker-iamge:
           requires: [lint]
+      - create-eks-cluster:
+          requires: [build-push-docker-iamge]
