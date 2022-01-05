@@ -24,7 +24,62 @@ jobs:
             . phoenix/bin/activate
             make lint
 
+build-push-docker-iamge:
+  docker:
+    - image: cimg/python:3.10.1
+      auth:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+
+  working_directory: ~/app
+
+  steps:
+    - checkout
+
+    - setup_remote_docker:
+        version: 19.03.13
+        docker_layer_caching: true
+
+    - run:
+        name: INSTALL DEPENDENCIES
+        command: |
+          python3 -m venv phoenix
+          . phoenix/bin/activate
+
+          make install
+
+    - run:
+        name: BUILD DOCKER IMAGE
+        command: |
+
+          . phoenix/bin/activate
+
+          echo "Building Image Now..."
+          docker build -t phoenix .
+
+          echo ""
+          echo "Check Image If Exists"
+          docker images| grep phoenix
+
+    - run:
+        name: PUSH DOCKER IMAGE
+        command: |
+          . phoenix/bin/activate
+
+          echo "USING CIRCLE WORKFLOW ID FOR VERSIONING"
+          docker tag phoenix ${DOCKER_USER}/phoenix:${CIRCLE_WORKFLOW_ID:0:7}
+
+          echo ""
+          echo "LOGGING INTO DOCKER HUB"
+          echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USER} --password-stdin
+
+          echo ""
+          echo "PUSH IMAGE TO DOCKER HUB"
+          docker push ${DOCKER_USER}/phoenix:${CIRCLE_WORKFLOW_ID:0:7}
+
 workflows:
   build-push-deploy:
     jobs:
       - lint
+      - build-push-docker-iamge:
+          requires: [lint]
