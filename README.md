@@ -355,3 +355,40 @@
 
     bash-3.2$ curl ${LoadBalancerHostName}:80
     Hello World, This is sample application deployed by Hanish Arora for Udacity DevOps Capstone! Happy Coding!
+
+
+
+
+
+                        ###############################     CIRCLE CI EVERYTHING     ###############################
+
+# Add CirlceCI
+
+    -- Create .circle directory in project root directory
+
+    mkdir .circleci
+
+    -- Create config.yml in .circleci directory
+
+    touch config.yml
+
+    Create CircleCI Project from your Github Repository
+
+# Establish AWS/CI Communication
+
+    -- ADD Below AWS Properties in CIRCLE CI Project Environment Variables
+
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+    AWS_DEFAULT_REGION
+
+    You can find these at below location
+
+    ~/.aws/credentials
+
+# Establish CI/Docker Communication
+
+    -- ADD Below Credentials in CIRCLE CI Project Environment Variables
+
+    DOCKER_USER
+    DOCKER_PASSWORD
