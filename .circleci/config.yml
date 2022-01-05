@@ -24,7 +24,7 @@ jobs:
             . phoenix/bin/activate
             make lint
 
-  build-push-docker-iamge:
+  build-push-docker-image:
     docker:
       - image: cimg/python:3.10.1
         auth:
@@ -237,7 +237,7 @@ workflows:
   build-push-deploy:
     jobs:
       - lint
-      - build-push-docker-iamge:
+      - build-push-docker-image:
           requires: [lint]
       - create-eks-cluster:
           requires: [build-push-docker-iamge]
