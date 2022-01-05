@@ -240,6 +240,6 @@ workflows:
       - build-push-docker-image:
           requires: [lint]
       - create-eks-cluster:
-          requires: [build-push-docker-iamge]
+          requires: [build-push-docker-image]
       - deploy-application:
           requires: [create-eks-cluster]
