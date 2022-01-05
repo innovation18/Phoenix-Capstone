@@ -54,14 +54,6 @@ jobs:
 
             . phoenix/bin/activate
 
-            cat app.py | grep VERSION
-            echo "Change Deployment Version..."
-            sed -i 's/VERSION/'${CIRCLE_WORKFLOW_ID:0:7}'/g' app.py
-
-            echo ""
-            echo "Look out for the change..."
-            cat app.py | grep VERSION
-
             echo ""
             echo "Building Image Now..."
             docker build -t phoenix .
