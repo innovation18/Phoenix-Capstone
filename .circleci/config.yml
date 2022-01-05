@@ -139,6 +139,100 @@ jobs:
             echo "Already Exists Your Cluster"
             fi
 
+  deploy-application:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+
+      - run:
+          name: INSTALL AWSCLI
+          command: |
+
+            pip3 install awscli
+
+            aws --version
+
+      - run:
+          name: INSTALL EKSCTL
+          command: |
+
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
+
+            eksctl version
+
+      - run:
+          name: INSTALL KUBECTL
+          command: |
+
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin
+
+            kubectl version --client
+
+      - run:
+          name: DEPLOY APP
+          command: |
+
+            echo "Check IF Already Exists"
+
+            Cluster_ARN=`aws cloudformation list-exports --query "Exports[?Name=='eksctl-phoenix-cluster::ARN'].Value" --no-paginate --output text`
+
+            if [ -z "$Cluster_ARN" ]
+            then 
+
+            echo "Does Not Exist - Creating One..."
+
+            eksctl create cluster \
+            --name phoenix \
+            --region us-west-2 \
+            --version 1.19 \
+            --nodegroup-name phoenix-workers \
+            --node-type t2.micro \
+            --nodes 2 \
+            --nodes-min 1 \
+            --nodes-max 2 \
+
+
+            else 
+            echo "Already Exists Your Cluster! Let's Deploy!!!"
+            fi
+
+
+            echo "Change Deployment Version"
+            sed -i 's/version/'${CIRCLE_WORKFLOW_ID:0:7}'/g' deploy.yml
+
+
+            aws eks update-kubeconfig --name phoenix
+            kubectl config use-context $Cluster_ARN
+            kubectl config current-context
+            kubectl apply -f deploy.yml
+            kubectl rollout status deployment/phoenix
+            kubectl apply -f service.yml
+
+      - run:
+          name: TEST APP
+          command: |
+
+            kubectl get svc -o wide
+            LoadBalancer=`kubectl get svc phoenix -o jsonpath="{.status.loadBalancer.ingress[*].hostname}"`
+
+            echo ""
+            echo $LoadBalancer
+            echo ""
+
+            if curl -s ${LoadBalancerHostName}:80 | grep "Udacity DevOps Capstone!"
+            then
+              echo "Here It is marking completion of DevOps Capstone!"
+              echo "Wait! You got to collect evidences!"
+              return 0
+            else
+              echo "Ah! It ain't here yet! Don't Lose Hope! You Got it!"
+              return 1
+            fi
+
 workflows:
   build-push-deploy:
     jobs:
@@ -147,3 +241,5 @@ workflows:
           requires: [lint]
       - create-eks-cluster:
           requires: [build-push-docker-iamge]
+      - deploy-application:
+          requires: [create-eks-cluster]
