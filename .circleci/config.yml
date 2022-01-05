@@ -24,7 +24,7 @@ jobs:
             . phoenix/bin/activate
             make lint
 
-workflow:
+workflows:
   build-push-deploy:
     jobs:
       - lint
